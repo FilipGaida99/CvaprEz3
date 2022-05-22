@@ -1,5 +1,5 @@
 # a)
-set.seed(1)
+set.seed(2137)
 X <- rnorm(100)
 noise <- rnorm(100)
 Beta <- c(0.2137,0.420,0.911,0.69)
@@ -17,7 +17,7 @@ require(tidyverse);require(ggplot2);require(ggthemes);
 
 data_frame(Cp = fit_summary$cp,
            BIC = fit_summary$bic,
-           AdjR2 = fit_summary$adjr2) %>%
+           R2 = fit_summary$adjr2) %>%
   mutate(id = row_number()) %>%
   gather(value_type, value, -id) %>%
   ggplot(aes(id, value, col = value_type)) +
