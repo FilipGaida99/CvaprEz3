@@ -1,8 +1,8 @@
 # a)
-set.seed(2137)
+set.seed(1)
 X <- rnorm(100)
 noise <- rnorm(100)
-Beta <- c(0.2137,0.420,0.911,0.69)
+Beta <- c(0.2137,0.420,-0.911,0.69)
 # b)
 Y <- Beta[1] + Beta[2] *X + Beta[3] *X^2 - Beta[4] *X^3 + noise
 
@@ -24,6 +24,24 @@ data_frame(Cp = fit_summary$cp,
   geom_line() + geom_point() + ylab('') + xlab('Number of Variables Used') +
   facet_wrap(~ value_type, scales = 'free') +
   theme_tufte() + scale_x_continuous(breaks = 1:10)
+
+# c2)
+library(leaps)
+df <- data.frame(Y, X)
+fit <- regsubsets(Y ~ poly(X, 10), data = df, nvmax = 10)
+fit_summary <- summary(fit)
+
+cp <- fit_summary$cp
+plot(cp, xlab="Variables number", ylab = "cp", type = "l")
+points(which.min(cp), cp[which.min(cp)], col = "red", cex = 1.5, pch = 1)
+
+bic <- fit_summary$bic
+plot(bic, xlab="Variables number", ylab = "bic", type = "l")
+points(which.min(bic), bic[which.min(bic)], col = "red", cex = 1.5, pch = 1)
+
+adjr2 <- fit_summary$adjr2
+plot(adjr2, xlab="Variables number", ylab = "adjr2", type = "l")
+points(which.max(adjr2), adjr2[which.max(adjr2)], col = "red", cex = 1.5, pch = 1)
 
 # d)
 #backward
