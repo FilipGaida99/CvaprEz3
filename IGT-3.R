@@ -6,25 +6,6 @@ Beta <- c(0.2137,0.420,-0.911,0.69)
 # b)
 Y <- Beta[1] + Beta[2] *X + Beta[3] *X^2 - Beta[4] *X^3 + noise
 
-# c)
-require(leaps)
-df <- data.frame(Y, X)
-fit <- regsubsets(Y ~ poly(X, 10), data = df, nvmax = 10)
-
-fit_summary <- summary(fit)
-
-require(tidyverse);require(ggplot2);require(ggthemes);
-
-data_frame(Cp = fit_summary$cp,
-           BIC = fit_summary$bic,
-           R2 = fit_summary$adjr2) %>%
-  mutate(id = row_number()) %>%
-  gather(value_type, value, -id) %>%
-  ggplot(aes(id, value, col = value_type)) +
-  geom_line() + geom_point() + ylab('') + xlab('Number of Variables Used') +
-  facet_wrap(~ value_type, scales = 'free') +
-  theme_tufte() + scale_x_continuous(breaks = 1:10)
-
 # c2)
 library(leaps)
 df <- data.frame(Y, X)
@@ -43,32 +24,57 @@ adjr2 <- fit_summary$adjr2
 plot(adjr2, xlab="Variables number", ylab = "adjr2", type = "l")
 points(which.max(adjr2), adjr2[which.max(adjr2)], col = "red", cex = 1.5, pch = 1)
 
+coef(fit, which.min(cp))
+coef(fit, which.min(bic))
+coef(fit, which.max(adjr2))
+
+
 # d)
 #backward
 require(caret)
 
-model_back <- train(Y ~ poly(X, 10), data = df, 
-                    method = 'glmStepAIC', direction = 'backward', 
-                    trace = 0,
-                    trControl = trainControl(method = 'none', verboseIter = FALSE))
+fit_backward <- regsubsets(Y ~ poly(X, 10), data = df, nvmax = 10, method = "backward")
+summary_backward <- summary(fit_backward)
 
-postResample(predict(model_back, df), df$Y)
+cp_backward <- summary_backward$cp
+bic_backward <- summary_backward$bic
+adjr2_backward <- summary_backward$adjr2
 
-summary(model_back$finalModel)
+plot(cp_backward, xlab = "Variables number", ylab = "Cp", type = "l")
+points(which.min(cp_backward), cp_backward[which.min(cp_backward)], col = "red", cex = 2, pch = 20)
+
+plot(bic_backward, xlab = "Vriables number", ylab = "BIC", type = "l")
+points(which.min(bic_backward), bic_backward[which.min(bic_backward)], col = "red", cex = 2, pch = 20)
+
+plot(adjr2_backward, xlab = "Variables number", ylab = "Adjr2", type = "l")
+points(which.max(adjr2_backward), adjr2_backward[which.max(adjr2_backward)], col = "red", cex = 2, pch = 20)
+
+coef(fit_backward, which.min(cp_backward))
+coef(fit_backward, which.min(bic_backward))
+coef(fit_backward, which.max(adjr2_backward))
 
 #forward
 
-x_poly <- poly(df$X, 10)
+fit_forward <- regsubsets(Y ~ poly(X, 10), data = df, nvmax = 10, method = "forward")
+summary_forward <- summary(fit_forward)
 
-colnames(x_poly) <- paste0('poly', 1:10)
-model_forw <- train(y = Y, x = x_poly,
-                    method = 'glmStepAIC', direction = 'forward',
-                    trace = 0,
-                    trControl = trainControl(method = 'none', verboseIter = FALSE))
+cp_forward <- summary_forward$cp
+bic_forward <- summary_forward$bic
+adjr2_forward <- summary_forward$adjr2
 
-postResample(predict(model_forw, data.frame(x_poly)), df$Y)
+plot(cp_forward, xlab = "Variables number", ylab = "Cp", type = "l")
+points(which.min(cp_forward), cp_forward[which.min(cp_forward)], col = "red", cex = 2, pch = 20)
 
-summary(model_forw$finalModel)
+plot(bic_forward, xlab = "Vriables number", ylab = "BIC", type = "l")
+points(which.min(bic_forward), bic_forward[which.min(bic_forward)], col = "red", cex = 2, pch = 20)
+
+plot(adjr2_forward, xlab = "Variables number", ylab = "Adjr2", type = "l")
+points(which.max(adjr2_forward), adjr2_forward[which.max(adjr2_forward)], col = "red", cex = 2, pch = 20)
+
+coef(fit_forward, which.min(cp_forward))
+coef(fit_forward, which.min(bic_forward))
+coef(fit_forward, which.max(adjr2_forward))
+
 
 # e)
 lasso_model <- train(Y ~ poly(X, 10), data = df,
