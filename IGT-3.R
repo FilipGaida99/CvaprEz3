@@ -4,7 +4,7 @@ X <- rnorm(100)
 noise <- rnorm(100)
 Beta <- c(0.2137,0.420,-0.911,0.69)
 # b)
-Y <- Beta[1] + Beta[2] *X + Beta[3] *X^2 - Beta[4] *X^3 + noise
+Y <- Beta[1] + Beta[2] *X + Beta[3] *X^2 + Beta[4] *X^3 + noise
 
 # c2)
 library(leaps)
@@ -83,19 +83,19 @@ coef(fit_forward, which.max(adjr2_forward))
 
 
 # e)
-lasso_model <- train(Y ~ poly(X, 10), data = df,
-                     method = 'glmnet',
-                     trControl = trainControl(method = 'cv', number = 10),
-                     tuneGrid = expand.grid(alpha = 1,
-                                            lambda = seq(0.001, 0.2, by = 0.005)))
+library(glmnet)
+set.seed(1)
+par(mfrow = c(1,1))
 
-plot(lasso_model)
+xmat <- model.matrix(Y ~ poly(X, 10), data = df)[, -1]
+crossval_lasso <- cv.glmnet(xmat, Y, alpha = 1)
 
-plot(varImp(lasso_model))
+plot(crossval_lasso)
 
-coef(lasso_model$finalModel, lasso_model$bestTune$lambda)
+best_lambda <- crossval_lasso$lambda.min
 
-postResample(predict(lasso_model, df), df$Y)
+lasso <- glmnet(xmat, Y, alpha = 1)
+predict(lasso, s = best_lambda, type = "coefficients")[1:11, ]
 
 # f)
 Beta[7] <- 5
