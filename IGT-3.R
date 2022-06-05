@@ -12,6 +12,8 @@ df <- data.frame(Y, X)
 fit <- regsubsets(Y ~ poly(X, 10), data = df, nvmax = 10)
 fit_summary <- summary(fit)
 
+par(mfrow = c(1, 3))
+
 cp <- fit_summary$cp
 plot(cp, xlab="Variables number", ylab = "cp", type = "l")
 points(which.min(cp), cp[which.min(cp)], col = "red", cex = 1.5, pch = 1)
@@ -40,6 +42,8 @@ cp_backward <- summary_backward$cp
 bic_backward <- summary_backward$bic
 adjr2_backward <- summary_backward$adjr2
 
+par(mfrow = c(1, 3))
+
 plot(cp_backward, xlab = "Variables number", ylab = "Cp", type = "l")
 points(which.min(cp_backward), cp_backward[which.min(cp_backward)], col = "red", cex = 2, pch = 20)
 
@@ -57,6 +61,8 @@ coef(fit_backward, which.max(adjr2_backward))
 
 fit_forward <- regsubsets(Y ~ poly(X, 10), data = df, nvmax = 10, method = "forward")
 summary_forward <- summary(fit_forward)
+
+par(mfrow = c(1, 3))
 
 cp_forward <- summary_forward$cp
 bic_forward <- summary_forward$bic
