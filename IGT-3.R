@@ -100,7 +100,7 @@ predict(lasso, s = best_lambda, type = "coefficients")[1:11, ]
 # f)
 Beta[7] <- 5
 Y_7 <- Beta[1] + Beta[7]*X^7 + noise
-df_2 <- data_frame(Y_7 = Y_7, X = X)
+df_2 <- data.frame(Y_7 = Y_7, X = X)
 
 fit <- regsubsets(Y_7 ~ poly(X, 10), data = df_2, nvmax = 10)
 
