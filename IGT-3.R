@@ -33,8 +33,6 @@ coef(fit, which.max(adjr2))
 
 # d)
 #backward
-require(caret)
-
 fit_backward <- regsubsets(Y ~ poly(X, 10), data = df, nvmax = 10, method = "backward")
 summary_backward <- summary(fit_backward)
 
@@ -141,3 +139,4 @@ best_lambda <- crossval_lasso$lambda.min
 
 lasso <- glmnet(xmat, Y_7, alpha = 1)
 predict(lasso, s = best_lambda, type = "coefficients")[1:11, ]
+
